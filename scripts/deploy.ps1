@@ -167,6 +167,9 @@ function Get-OrCreateSSHKey {
             Write-Success "Znaleziono klucz: $defaultKeyPath"
             return $keyContent
         }
+        else {
+            Write-Warning "Plik $defaultKeyPath istnieje, ale nie zawiera prawidłowego klucza SSH (zostanie pominięty)"
+        }
     }
     
     # Sprawdź czy istnieje klucz bielik-azure-key
