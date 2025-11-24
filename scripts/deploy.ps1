@@ -195,7 +195,7 @@ function Get-OrCreateSSHKey {
     
     if (Test-Path "$newKeyPath.pub") {
         $keyContent = (Get-Content "$newKeyPath.pub" -Raw).Trim()
-        if ($keyContent -match '^ssh-rsa ') {
+        if ($keyContent -match '^ssh-rsa |^ecdsa-sha2-|^ssh-ed25519 ') {
             Write-Success "Wygenerowano nowy klucz: $newKeyPath.pub"
             Write-Host "  Klucz prywatny: $newKeyPath"
             Write-Warning "WAŻNE: Zapisz klucz prywatny w bezpiecznym miejscu!"
