@@ -148,30 +148,60 @@ function Get-OrCreateSSHKey {
     Write-Step "Konfiguracja klucza SSH..."
     
     if ($Path -and (Test-Path $Path)) {
-        Write-Success "Używam klucza: $Path"
-        return Get-Content $Path -Raw
+        $keyContent = (Get-Content $Path -Raw).Trim()
+        if ($keyContent -match '^ssh-rsa |^ecdsa-sha2-|^ssh-ed25519 ') {
+            Write-Success "Używam klucza: $Path"
+            return $keyContent
+        }
+        else {
+            Write-Warning "Plik $Path nie zawiera prawidłowego klucza publicznego SSH"
+        }
     }
     
     # Domyślna lokalizacja
     $defaultKeyPath = Join-Path $env:USERPROFILE ".ssh\id_rsa.pub"
     
     if (Test-Path $defaultKeyPath) {
-        Write-Success "Znaleziono klucz: $defaultKeyPath"
-        return Get-Content $defaultKeyPath -Raw
+        $keyContent = (Get-Content $defaultKeyPath -Raw).Trim()
+        if ($keyContent -match '^ssh-rsa |^ecdsa-sha2-|^ssh-ed25519 ') {
+            Write-Success "Znaleziono klucz: $defaultKeyPath"
+            return $keyContent
+        }
     }
     
     # Generuj nowy klucz
     Write-Warning "Brak klucza SSH. Generuję nowy..."
-    $newKeyPath = Join-Path $env:USERPROFILE ".ssh\bielik-azure-key"
-    
-    ssh-keygen -t rsa -b 4096 -f $newKeyPath -N '""' -C "bielik-azure-vm"
-    
-    if (Test-Path "$newKeyPath.pub") {
-        Write-Success "Wygenerowano nowy klucz: $newKeyPath.pub"
-        return Get-Content "$newKeyPath.pub" -Raw
+    $sshDir = Join-Path $env:USERPROFILE ".ssh"
+    if (-not (Test-Path $sshDir)) {
+        New-Item -ItemType Directory -Path $sshDir -Force | Out-Null
     }
     
-    throw "Nie można utworzyć klucza SSH"
+    $newKeyPath = Join-Path $sshDir "bielik-azure-key"
+    
+    # Usuń stary klucz jeśli istnieje
+    if (Test-Path $newKeyPath) {
+        Remove-Item $newKeyPath -Force
+    }
+    if (Test-Path "$newKeyPath.pub") {
+        Remove-Item "$newKeyPath.pub" -Force
+    }
+    
+    # Generuj nowy klucz bez hasła (-N "")
+    $result = ssh-keygen -t rsa -b 4096 -f $newKeyPath -N '""' -C "bielik-azure-vm" 2>&1
+    
+    if (Test-Path "$newKeyPath.pub") {
+        $keyContent = (Get-Content "$newKeyPath.pub" -Raw).Trim()
+        if ($keyContent -match '^ssh-rsa ') {
+            Write-Success "Wygenerowano nowy klucz: $newKeyPath.pub"
+            Write-Host "  Klucz prywatny: $newKeyPath"
+            return $keyContent
+        }
+        else {
+            throw "Wygenerowany klucz ma nieprawidłowy format"
+        }
+    }
+    
+    throw "Nie można utworzyć klucza SSH. Output: $result"
 }
 
 # ============================================================================
