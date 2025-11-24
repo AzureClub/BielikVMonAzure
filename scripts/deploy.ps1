@@ -228,7 +228,7 @@ if (-not (Test-AzureCLI)) { exit 1 }
 if (-not (Test-AzureLogin)) { exit 1 }
 
 # Automatyczne wykrywanie typu uwierzytelniania
-$AuthenticationType = if ($AdminPassword -and $AdminPassword.Length -gt 0) { 'password' } else { 'sshPublicKey' }
+$AuthenticationType = if ($AdminPassword) { 'password' } else { 'sshPublicKey' }
 
 # Konfiguracja uwierzytelniania
 $sshPublicKey = ""
