@@ -154,7 +154,7 @@ function Get-OrCreateSSHKey {
             return $keyContent
         }
         else {
-            Write-Warning "Plik $Path nie zawiera prawidłowego klucza publicznego SSH"
+            throw "Plik $Path nie zawiera prawidłowego klucza publicznego SSH"
         }
     }
     
