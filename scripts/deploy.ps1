@@ -187,7 +187,7 @@ function Get-OrCreateSSHKey {
     }
     
     # Generuj nowy klucz bez hasła (-N "")
-    $result = ssh-keygen -t rsa -b 4096 -f $newKeyPath -N '""' -C "bielik-azure-vm" 2>&1
+    $result = ssh-keygen -t rsa -b 4096 -f $newKeyPath -N "" -C "bielik-azure-vm" 2>&1
     
     if (Test-Path "$newKeyPath.pub") {
         $keyContent = (Get-Content "$newKeyPath.pub" -Raw).Trim()
