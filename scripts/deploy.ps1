@@ -169,22 +169,26 @@ function Get-OrCreateSSHKey {
         }
     }
     
+    # Sprawdź czy istnieje klucz bielik-azure-key
+    $sshDir = Join-Path $env:USERPROFILE ".ssh"
+    $bielikKeyPath = Join-Path $sshDir "bielik-azure-key.pub"
+    
+    if (Test-Path $bielikKeyPath) {
+        $keyContent = (Get-Content $bielikKeyPath -Raw).Trim()
+        if ($keyContent -match '^ssh-rsa |^ecdsa-sha2-|^ssh-ed25519 ') {
+            Write-Success "Znaleziono istniejący klucz: $bielikKeyPath"
+            Write-Host "  Klucz prywatny: $($bielikKeyPath -replace '\.pub$','')"
+            return $keyContent
+        }
+    }
+    
     # Generuj nowy klucz
     Write-Warning "Brak klucza SSH. Generuję nowy..."
-    $sshDir = Join-Path $env:USERPROFILE ".ssh"
     if (-not (Test-Path $sshDir)) {
         New-Item -ItemType Directory -Path $sshDir -Force | Out-Null
     }
     
     $newKeyPath = Join-Path $sshDir "bielik-azure-key"
-    
-    # Usuń stary klucz jeśli istnieje
-    if (Test-Path $newKeyPath) {
-        Remove-Item $newKeyPath -Force
-    }
-    if (Test-Path "$newKeyPath.pub") {
-        Remove-Item "$newKeyPath.pub" -Force
-    }
     
     # Generuj nowy klucz bez hasła (-N "")
     $result = ssh-keygen -t rsa -b 4096 -f $newKeyPath -N "" -C "bielik-azure-vm" 2>&1
@@ -194,6 +198,7 @@ function Get-OrCreateSSHKey {
         if ($keyContent -match '^ssh-rsa ') {
             Write-Success "Wygenerowano nowy klucz: $newKeyPath.pub"
             Write-Host "  Klucz prywatny: $newKeyPath"
+            Write-Warning "WAŻNE: Zapisz klucz prywatny w bezpiecznym miejscu!"
             return $keyContent
         }
         else {
