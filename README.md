@@ -36,11 +36,11 @@ Kompletne, gotowe do użycia rozwiązanie do automatycznego wdrożenia polskiego
 
 Rozwiązanie automatycznie tworzy:
 
-- **Virtual Machine**: Ubuntu 22.04 LTS (Standard_D8s_v3 lub z GPU)
+- **Virtual Machine**: Ubuntu 22.04 LTS
 - **Networking**: VNet, Subnet, Public IP, NSG
 - **Storage**: OS Disk (Premium SSD)
 - **Ollama**: Automatycznie zainstalowane
-- **Bielik**: Model `SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M` pobrany i gotowy
+- **Bielik**: Model `SpeakLeash/bielik-11b-v2.6-instruct` pobrany i gotowy
 
 ### Porty otwarte w NSG
 - **22**: SSH
@@ -62,6 +62,15 @@ $pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
     -VmSize Standard_NC24ads_A100_v4 `
     -Location polandcentral `
     -AdminPassword $pwd `
+    -EnablePublicOllamaAccess $true
+
+# Alternatywnie: użyj SSH (domyślnie, bez hasła)
+.
+\scripts\deploy.ps1 `
+    -Environment prod `
+    -ResourceGroupName bielik-rg `
+    -VmSize Standard_NC24ads_A100_v4 `
+    -Location polandcentral `
     -EnablePublicOllamaAccess $true
 
 # 3. Po ~15-20 minutach testuj API (zastąp IP otrzymanym po deployment)
@@ -124,7 +133,7 @@ Skrypt automatycznie:
 ### Rozmiary VM
 
 | Rozmiar | vCPU | RAM | GPU | Zalecenia |
-|---------|------|-----|-----|-----------||
+|---------|------|-----|-----|-----------|
 | Standard_D4s_v3 | 4 | 16 GB | - | Minimum, wolniejsze |
 | Standard_D8s_v3 | 8 | 32 GB | - | **Zalecane** dla CPU |
 | Standard_NC6s_v3 | 6 | 112 GB | Tesla V100 | GPU starszej generacji |
@@ -141,29 +150,31 @@ Pełna lista w `bicep/main.bicep`:
 param vmName string = 'bielik-vm'
 param vmSize string = 'Standard_D8s_v3'
 param adminUsername string = 'azureuser'
+param authenticationType string = 'sshPublicKey'  // domyślnie SSH
 param location string = resourceGroup().location
-param bielikModel string = 'SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M'
+param bielikModel string = 'SpeakLeash/bielik-11b-v2.6-instruct'
 ```
 
 ### Uwierzytelnianie
 
-**Domyślnie: Hasło** (prostsze, zalecane)
+**Domyślnie: Klucz SSH** (bezpieczne, automatyczne)
 ```powershell
-# Skrypt zapyta o hasło podczas deployment
+# Skrypt automatycznie użyje lub wygeneruje klucz SSH (~/.ssh/id_rsa.pub lub ~/.ssh/bielik-azure-key.pub)
 .\scripts\deploy.ps1 -Environment dev -ResourceGroupName bielik-rg
 
-# Lub podaj hasło w parametrze
-$pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
-.\scripts\deploy.ps1 -AuthenticationType password -AdminPassword $pwd -ResourceGroupName bielik-rg
+# Lub wskaż konkretny klucz
+.\scripts\deploy.ps1 -SshPublicKeyPath "~/.ssh/id_rsa.pub" -ResourceGroupName bielik-rg
 ```
 
-**Opcjonalnie: Klucz SSH** (bardziej bezpieczne)
+**Opcjonalnie: Hasło** (prostsze dla testów)
 ```powershell
-# Wygeneruj nowy klucz
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/bielik-azure-key
+# Podaj hasło jako parametr
+$pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
+.\scripts\deploy.ps1 -AdminPassword $pwd -ResourceGroupName bielik-rg
 
-# Użyj w deploymencie
-.\scripts\deploy.ps1 -AuthenticationType sshPublicKey -SshPublicKeyPath "~/.ssh/bielik-azure-key.pub" -ResourceGroupName bielik-rg
+# Lub skrypt zapyta o hasło interaktywnie
+.\scripts\deploy.ps1 -ResourceGroupName bielik-rg
+# Następnie wybierz opcję hasła i wprowadź
 ```
 
 ## 📦 Deployment
