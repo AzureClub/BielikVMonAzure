@@ -4,6 +4,7 @@
 [![Bicep](https://img.shields.io/badge/Bicep-blue?style=flat&logo=microsoft&logoColor=white)](https://learn.microsoft.com/azure/azure-resource-manager/bicep/)
 [![Ollama](https://img.shields.io/badge/Ollama-000000?style=flat&logo=ollama&logoColor=white)](https://ollama.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Security Audit](https://img.shields.io/badge/Security-Audited-green.svg)](SECURITY_AUDIT.md)
 
 Kompletne, gotowe do użycia rozwiązanie do automatycznego wdrożenia polskiego modelu językowego **Bielik** z **Ollama** na maszynie wirtualnej **Azure**.
 
@@ -18,6 +19,7 @@ Kompletne, gotowe do użycia rozwiązanie do automatycznego wdrożenia polskiego
 - [Deployment](#deployment)
 - [Weryfikacja](#weryfikacja)
 - [Troubleshooting](#troubleshooting)
+- [Bezpieczeństwo](#bezpieczeństwo)
 
 ## 🔧 Wymagania
 
@@ -351,6 +353,26 @@ az vm start -g bielik-rg -n bielik-vm
 ```powershell
 az vm auto-shutdown -g bielik-rg -n bielik-vm --time 1800  # 18:00 UTC
 ```
+
+---
+
+## 🔒 Bezpieczeństwo
+
+To repozytorium zostało poddane audytowi bezpieczeństwa i jest bezpieczne dla użytku publicznego.
+
+### Dokumentacja Bezpieczeństwa
+- 📋 [**Audyt Bezpieczeństwa**](SECURITY_AUDIT.md) - Szczegółowy raport z audytu
+- 🛡️ [**Polityka Bezpieczeństwa**](SECURITY.md) - Jak zgłaszać podatności
+
+### Najlepsze Praktyki
+- ✅ Używaj silnych haseł (12+ znaków) lub kluczy SSH
+- ✅ Ogranicz NSG do zaufanych IP (SSH port 22)
+- ✅ Ustaw `enablePublicOllamaAccess: false` jeśli nie potrzebujesz publicznego API
+- ❌ NIGDY nie commituj haseł lub kluczy SSH do repozytorium
+- ❌ NIGDY nie używaj przykładowych haseł z dokumentacji w produkcji
+
+### Zgłaszanie Podatności
+Znalazłeś lukę bezpieczeństwa? Zobacz [SECURITY.md](SECURITY.md) dla instrukcji zgłaszania.
 
 ---
 
