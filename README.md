@@ -49,21 +49,46 @@ Rozwiązanie automatycznie tworzy:
 
 ## 🚀 Szybki start
 
-### 1. Sklonuj repozytorium
+### Najszybsza metoda (A100 GPU w Polsce) 🚀
 
-```bash
-git clone <repository-url>
-cd BielikVM
+```powershell
+# 1. Ustaw hasło (będzie zapisane w zmiennej $pwd)
+$pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
+
+# 2. Uruchom deployment z A100 GPU
+.\scripts\deploy.ps1 `
+    -Environment prod `
+    -ResourceGroupName bielik-rg `
+    -VmSize Standard_NC24ads_A100_v4 `
+    -Location polandcentral `
+    -AdminPassword $pwd `
+    -EnablePublicOllamaAccess $true
+
+# 3. Po ~15-20 minutach testuj API (zastąp IP otrzymanym po deployment)
+curl http://20.20.20.20:11434/api/chat -d '{
+  "model": "SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M",
+  "stream": false,
+  "messages": [{"role": "user", "content": "Kim jest Adam Mickiewicz?"}]
+}'
 ```
 
-### 2. Zaloguj się do Azure
+### Krok po kroku
+
+#### 1. Sklonuj repozytorium
+
+```bash
+git clone https://github.com/AzureClub/BielikVMonAzure.git
+cd BielikVMonAzure
+```
+
+#### 2. Zaloguj się do Azure
 
 ```powershell
 az login
 az account set --subscription "<your-subscription-id>"
 ```
 
-### 3. Dostosuj parametry (opcjonalnie)
+#### 3. Dostosuj parametry (opcjonalnie)
 
 Edytuj plik `parameters/dev.parameters.json`:
 
@@ -75,17 +100,17 @@ Edytuj plik `parameters/dev.parameters.json`:
 }
 ```
 
-### 4. Uruchom deployment
+#### 4. Uruchom deployment
 
 ```powershell
-# PowerShell
+# PowerShell - podstawowy deployment
 .\scripts\deploy.ps1 -Environment dev -ResourceGroupName bielik-rg
 
 # Bash
 ./scripts/deploy.sh dev bielik-rg
 ```
 
-### 5. Czekaj na zakończenie (~15-20 minut)
+#### 5. Czekaj na zakończenie (~15-20 minut)
 
 Skrypt automatycznie:
 - Utworzy resource group
