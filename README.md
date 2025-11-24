@@ -65,8 +65,7 @@ $pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
     -EnablePublicOllamaAccess $true
 
 # Alternatywnie: użyj SSH (domyślnie, bez hasła)
-.
-\scripts\deploy.ps1 `
+.\scripts\deploy.ps1 `
     -Environment prod `
     -ResourceGroupName bielik-rg `
     -VmSize Standard_NC24ads_A100_v4 `
