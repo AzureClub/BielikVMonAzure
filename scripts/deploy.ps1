@@ -61,7 +61,7 @@ param(
     [bool]$EnablePublicOllamaAccess = $false,
 
     [Parameter(Mandatory = $false)]
-    [string]$BielikModel = 'SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M'
+    [string]$BielikModel = 'SpeakLeash/bielik-11b-v2.6-instruct:Q4_K_M'
 )
 
 $ErrorActionPreference = 'Stop'

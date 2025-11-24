@@ -44,9 +44,49 @@ systemctl daemon-reload
 systemctl restart ollama
 sleep 5
 
-# Pobieranie modelu Bielik
-echo "Pobieranie modelu Bielik (może to potrwać 10-15 minut)..."
-su - ${ADMIN_USER} -c "ollama pull ${BIELIK_MODEL}"
+# Pobieranie modelu Bielik v2.6 z HuggingFace
+echo "Pobieranie modelu Bielik v2.6 z HuggingFace (może to potrwać 10-15 minut)..."
+
+# Model jest dostępny tylko jako GGUF na HuggingFace, nie w bibliotece Ollama
+GGUF_URL="https://huggingface.co/speakleash/Bielik-11B-v2.6-Instruct-GGUF/resolve/main/Bielik-11B-v2.6-Instruct.Q4_K_M.gguf"
+GGUF_FILE="/tmp/bielik-v2.6-q4km.gguf"
+MODELFILE="/tmp/Modelfile.bielik-v2.6"
+
+# Pobierz plik GGUF
+echo "Pobieranie pliku GGUF (6.72GB)..."
+wget -q --show-progress -O "${GGUF_FILE}" "${GGUF_URL}" || {
+    echo "❌ Błąd pobierania pliku GGUF"
+    exit 1
+}
+
+# Utwórz Modelfile zgodnie z dokumentacją HuggingFace
+echo "Tworzenie Modelfile..."
+cat > "${MODELFILE}" << 'MODELFILE_EOF'
+FROM /tmp/bielik-v2.6-q4km.gguf
+
+TEMPLATE """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+"""
+
+PARAMETER stop "<|im_start|>"
+PARAMETER stop "<|im_end|>"
+PARAMETER temperature 0.6
+PARAMETER top_p 0.9
+MODELFILE_EOF
+
+# Utwórz model w Ollama z pobranego GGUF
+echo "Tworzenie modelu w Ollama..."
+su - ${ADMIN_USER} -c "ollama create ${BIELIK_MODEL} -f ${MODELFILE}" || {
+    echo "❌ Błąd tworzenia modelu w Ollama"
+    exit 1
+}
+
+# Opcjonalne: Usuń pliki tymczasowe (GGUF jest ~7GB)
+# rm -f "${GGUF_FILE}" "${MODELFILE}"
+echo "Plik GGUF pozostawiony w: ${GGUF_FILE}"
 
 # Weryfikacja instalacji
 echo "Weryfikacja instalacji..."
@@ -104,8 +144,13 @@ Model: ${BIELIK_MODEL}
 📚 Dokumentacja Ollama:
    https://github.com/ollama/ollama
 
-🇵🇱 Model Bielik:
-   https://huggingface.co/speakleash
+🇵🇱 Model Bielik v2.6:
+   https://huggingface.co/speakleash/Bielik-11B-v2.6-Instruct-GGUF
+
+⚠️ Uwaga:
+   Model v2.6 jest instalowany z HuggingFace (GGUF),
+   ponieważ nie jest jeszcze dostępny w bibliotece Ollama.
+   Plik GGUF (~7GB) znajduje się w /tmp/bielik-v2.6-q4km.gguf
 INFOEOF
 
 chown ${ADMIN_USER}:${ADMIN_USER} /home/${ADMIN_USER}/bielik-info.txt
