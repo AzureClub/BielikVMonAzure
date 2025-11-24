@@ -231,7 +231,9 @@ $passwordPlainText = ""
 
 if ($AuthenticationType -eq 'password') {
     Write-Step "Konfiguracja uwierzytelniania hasłem..."
-    $passwordPlainText = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($AdminPassword))
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($AdminPassword)
+    $passwordPlainText = [Runtime.InteropServices.Marshal]::PtrToStringUni($bstr)
+    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
     Write-Success "Hasło skonfigurowane"
 }
 else {
