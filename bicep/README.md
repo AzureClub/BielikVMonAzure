@@ -23,7 +23,7 @@ Główny template zawierający wszystkie zasoby:
 | `adminUsername` | string | azureuser | Nazwa użytkownika administratora |
 | `sshPublicKey` | securestring | - | Klucz publiczny SSH (wymagany) |
 | `location` | string | resourceGroup().location | Lokalizacja zasobów |
-| `bielikModel` | string | SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M | Model do zainstalowania |
+| `bielikModel` | string | SpeakLeash/bielik-11b-v2.6-instruct | Model do zainstalowania |
 | `enablePublicOllamaAccess` | bool | false | Czy otworzyć port 11434 publicznie |
 | `resourcePrefix` | string | bielik | Prefiks dla nazw zasobów |
 | `tags` | object | {...} | Tagi dla zasobów |

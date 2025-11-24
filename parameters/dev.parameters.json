@@ -15,7 +15,7 @@
       "value": "password"
     },
     "bielikModel": {
-      "value": "SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M"
+      "value": "SpeakLeash/bielik-11b-v2.6-instruct"
     },
     "enablePublicOllamaAccess": {
       "value": false

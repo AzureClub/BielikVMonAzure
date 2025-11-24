@@ -225,7 +225,7 @@ ssh azureuser@<PUBLIC_IP>
 
 ```bash
 ollama list
-# Powinien pokazać: SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M
+# Powinien pokazać: SpeakLeash/bielik-11b-v2.6-instruct
 
 curl http://localhost:11434/api/tags
 ```
@@ -234,7 +234,7 @@ curl http://localhost:11434/api/tags
 
 ```bash
 curl http://localhost:11434/api/chat -d '{
-  "model": "SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M",
+  "model": "SpeakLeash/bielik-11b-v2.6-instruct",
   "stream": false,
   "messages": [
     {
@@ -270,7 +270,7 @@ sudo systemctl restart ollama
 
 ```bash
 # Ręcznie pobierz model
-ollama pull SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M
+ollama pull SpeakLeash/bielik-11b-v2.6-instruct
 
 # Sprawdź dostępne modele
 ollama list
@@ -315,7 +315,7 @@ az vm extension list -g bielik-rg --vm-name bielik-vm
 
 ### Zewnętrzne zasoby
 - [Dokumentacja Ollama](https://github.com/ollama/ollama) - Ollama GitHub
-- [Bielik Model](https://huggingface.co/speakleash/Bielik-11B-v2.2-Instruct-GGUF) - HuggingFace
+- [Bielik Model](https://huggingface.co/speakleash/Bielik-11B-v2.6-Instruct-GGUF) - HuggingFace
 - [SpeakLeash](https://github.com/speakleash/Bielik-how-to-start) - Bielik how-to-start
 - [Azure VM Sizes](https://learn.microsoft.com/azure/virtual-machines/sizes) - Rozmiary VM
 - [Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/) - Dokumentacja Bicep

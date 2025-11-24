@@ -48,7 +48,7 @@ param sshPublicKey string = ''
 param location string = resourceGroup().location
 
 @description('Model Bielik do pobrania w Ollama')
-param bielikModel string = 'SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M'
+param bielikModel string = 'SpeakLeash/bielik-11b-v2.6-instruct'
 
 @description('Czy otworzyć port Ollama API (11434) publicznie')
 param enablePublicOllamaAccess bool = false
