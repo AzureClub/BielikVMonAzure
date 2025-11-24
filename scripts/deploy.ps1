@@ -186,6 +186,9 @@ function Get-OrCreateSSHKey {
             Write-Host "  Klucz prywatny: $($bielikKeyPath -replace '\.pub$','')"
             return $keyContent
         }
+        else {
+            Write-Warning "Plik $bielikKeyPath istnieje, ale nie zawiera prawidłowego klucza SSH (zostanie nadpisany)"
+        }
     }
     
     # Generuj nowy klucz
