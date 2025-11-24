@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "value": "bielik-dev-vm"
+    },
+    "vmSize": {
+      "value": "Standard_D8s_v3"
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "authenticationType": {
+      "value": "password"
+    },
+    "bielikModel": {
+      "value": "SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M"
+    },
+    "enablePublicOllamaAccess": {
+      "value": false
+    },
+    "resourcePrefix": {
+      "value": "bielik-dev"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development",
+        "Project": "Bielik-Ollama",
+        "ManagedBy": "Bicep",
+        "CostCenter": "R&D"
+      }
+    }
+  }
+}

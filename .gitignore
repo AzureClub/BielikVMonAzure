@@ -1,0 +1,32 @@
+# Azure
+*.parameters.local.json
+deployment-output.json
+*.deployment.json
+
+# SSH Keys
+*.pem
+*.key
+*.ppk
+!*.pub
+
+# Azure credentials
+.azure/
+*.publishsettings
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary
+temp/
+tmp/

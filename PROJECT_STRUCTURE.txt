@@ -1,0 +1,37 @@
+Folder PATH listing for volume OS
+Volume serial number is 08A6-E42D
+C:\REPOS\BIELIKVM
+|   .gitignore
+|   CONTRIBUTING.md
+|   LICENSE
+|   PROJECT_STRUCTURE.txt
+|   QUICKSTART.md
+|   README.md
+|   
++---bicep
+|       main.bicep
+|       README.md
+|       
++---docs
+|       ARCHITECTURE.md
+|       COSTS.md
+|       FAQ.md
+|       TROUBLESHOOTING.md
+|       
++---examples
+|       api-examples.md
+|       python-client.py
+|       requirements.txt
+|       
++---parameters
+|       dev.parameters.json
+|       prod.parameters.json
+|       staging.parameters.json
+|       
+\---scripts
+        cleanup.ps1
+        deploy.ps1
+        deploy.sh
+        README.md
+        test-connection.sh
+        
