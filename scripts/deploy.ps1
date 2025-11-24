@@ -18,17 +18,29 @@
 .PARAMETER VmSize
     Rozmiar VM
 
+.PARAMETER AdminPassword
+    Hasło administratora (SecureString). Jeśli podane, używa uwierzytelniania hasłem.
+    Jeśli nie podane, automatycznie używa klucza SSH.
+
 .PARAMETER SshPublicKeyPath
-    Ścieżka do klucza publicznego SSH
+    Ścieżka do klucza publicznego SSH (opcjonalne).
+    Jeśli nie podane, skrypt użyje ~/.ssh/id_rsa.pub lub wygeneruje nowy klucz.
 
 .PARAMETER EnablePublicOllamaAccess
     Czy otworzyć port Ollama API publicznie
 
 .EXAMPLE
     .\deploy.ps1 -Environment dev -ResourceGroupName bielik-rg
+    # Domyślnie: SSH key (automatycznie wygenerowany jeśli brak)
 
 .EXAMPLE
-    .\deploy.ps1 -Environment prod -ResourceGroupName bielik-prod-rg -VmSize Standard_NC6s_v3 -Location northeurope
+    $pwd = ConvertTo-SecureString "MyP@ssw0rd123!" -AsPlainText -Force
+    .\deploy.ps1 -Environment prod -ResourceGroupName bielik-rg -AdminPassword $pwd
+    # Z hasłem
+
+.EXAMPLE
+    .\deploy.ps1 -Environment prod -ResourceGroupName bielik-prod-rg -VmSize Standard_NC24ads_A100_v4 -Location polandcentral -EnablePublicOllamaAccess $true
+    # SSH key z customowym VM
 #>
 
 [CmdletBinding()]
@@ -46,10 +58,6 @@ param(
     [Parameter(Mandatory = $false)]
     [ValidateSet('Standard_D4s_v3', 'Standard_D8s_v3', 'Standard_D16s_v3', 'Standard_NC6s_v3', 'Standard_NC4as_T4_v3', 'Standard_NC24ads_A100_v4', 'Standard_NC48ads_A100_v4', 'Standard_NC96ads_A100_v4')]
     [string]$VmSize = 'Standard_D8s_v3',
-
-    [Parameter(Mandatory = $false)]
-    [ValidateSet('password', 'sshPublicKey')]
-    [string]$AuthenticationType = 'password',
 
     [Parameter(Mandatory = $false)]
     [SecureString]$AdminPassword,
@@ -184,33 +192,21 @@ Write-ColorOutput @"
 if (-not (Test-AzureCLI)) { exit 1 }
 if (-not (Test-AzureLogin)) { exit 1 }
 
+# Automatyczne wykrywanie typu uwierzytelniania
+$AuthenticationType = if ($AdminPassword) { 'password' } else { 'sshPublicKey' }
+
 # Konfiguracja uwierzytelniania
 $sshPublicKey = ""
 $passwordPlainText = ""
 
 if ($AuthenticationType -eq 'password') {
     Write-Step "Konfiguracja uwierzytelniania hasłem..."
-    
-    if (-not $AdminPassword) {
-        Write-Host "Wprowadź hasło dla użytkownika administratora:"
-        Write-Host "(Wymagania: min. 12 znaków, małe/wielkie litery, cyfry, znaki specjalne)"
-        $AdminPassword = Read-Host -AsSecureString -Prompt "Hasło"
-        $AdminPasswordConfirm = Read-Host -AsSecureString -Prompt "Potwierdź hasło"
-        
-        $pwd1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($AdminPassword))
-        $pwd2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($AdminPasswordConfirm))
-        
-        if ($pwd1 -ne $pwd2) {
-            Write-Error "Hasła nie pasują!"
-            exit 1
-        }
-    }
-    
     $passwordPlainText = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($AdminPassword))
     Write-Success "Hasło skonfigurowane"
 }
 else {
-    # Pobierz klucz SSH
+    Write-Step "Konfiguracja uwierzytelniania SSH..."
+    # Pobierz lub wygeneruj klucz SSH
     try {
         $sshPublicKey = Get-OrCreateSSHKey -Path $SshPublicKeyPath
     }
@@ -226,6 +222,7 @@ Write-Host "  Environment: $Environment"
 Write-Host "  Resource Group: $ResourceGroupName"
 Write-Host "  Location: $Location"
 Write-Host "  VM Size: $VmSize"
+Write-Host "  Authentication: $AuthenticationType"
 Write-Host "  Model: $BielikModel"
 Write-Host "  Public Ollama Access: $EnablePublicOllamaAccess"
 
