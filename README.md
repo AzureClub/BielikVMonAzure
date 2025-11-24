@@ -66,7 +66,7 @@ $pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
 
 # 3. Po ~15-20 minutach testuj API (zastąp IP otrzymanym po deployment)
 curl http://20.20.20.20:11434/api/chat -d '{
-  "model": "SpeakLeash/bielik-11b-v2.2-instruct:Q4_K_M",
+  "model": "SpeakLeash/bielik-11b-v2.6-instruct",
   "stream": false,
   "messages": [{"role": "user", "content": "Kim jest Adam Mickiewicz?"}]
 }'
