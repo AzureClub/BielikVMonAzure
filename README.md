@@ -72,7 +72,7 @@ $pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
     -AdminPassword $pwd `
     -EnablePublicOllamaAccess $true
 
-# Alternatywnie: użyj SSH (domyślnie, bez hasła)
+# Alternatywnie: użyj klucza SSH
 .\scripts\deploy.ps1 `
     -Environment prod `
     -ResourceGroupName bielik-rg `
@@ -86,6 +86,14 @@ curl http://20.20.20.20:11434/api/chat -d '{
   "stream": false,
   "messages": [{"role": "user", "content": "Kim jest Adam Mickiewicz?"}]
 }'
+
+# 6. Logowanie do maszyny VM
+
+ssh azureuser@20.20.20.20
+
+# Alternatywnie: użyj klucza SSH 
+ssh -i "ścieżka\do\klucza\prywatnego" azureuser@74.248.151.113
+
 ```
 
 ### Krok po kroku
