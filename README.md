@@ -25,12 +25,12 @@ Kompletne, gotowe do użycia rozwiązanie do automatycznego wdrożenia polskiego
 
 ### Azure
 - Aktywna subskrypcja Azure
-- Azure CLI zainstalowane ([instrukcja](https://learn.microsoft.com/cli/azure/install-azure-cli))
-- Wystarczające limity na VM (zalecane Standard_NC6s_v3 lub Standard_D8s_v3)
+- Wystarczające limity na VM (Standard_NC24ads_A100_v4)
 
 ### Lokalne
-- PowerShell 7+ lub Bash
-- Git (opcjonalnie)
+- PowerShell 7+
+- Git
+- Azure CLI zainstalowane ([instrukcja](https://learn.microsoft.com/cli/azure/install-azure-cli))
 
 ## 🏗️ Architektura
 
@@ -81,7 +81,7 @@ $pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
     -EnablePublicOllamaAccess $true
 
 # 5. Po ~15-20 minutach testuj API (zastąp IP otrzymanym po deployment)
-curl http://20.20.20.20:11434/api/chat -d '{
+curl http://<PUBLIC_IP>:11434/api/chat -d '{
   "model": "SpeakLeash/bielik-11b-v2.6-instruct",
   "stream": false,
   "messages": [{"role": "user", "content": "Kim jest Adam Mickiewicz?"}]
@@ -89,10 +89,10 @@ curl http://20.20.20.20:11434/api/chat -d '{
 
 # 6. Logowanie do maszyny VM
 
-ssh azureuser@20.20.20.20
+ssh azureuser@<PUBLIC_IP>
 
 # Alternatywnie: użyj klucza SSH 
-ssh -i "ścieżka\do\klucza\prywatnego" azureuser@74.248.151.113
+ssh -i "ścieżka\do\klucza\prywatnego" azureuser@<PUBLIC_IP>
 
 ```
 
@@ -118,7 +118,7 @@ Edytuj plik `parameters/dev.parameters.json`:
 
 ```json
 {
-  "vmSize": "Standard_D8s_v3",
+  "vmSize": "Standard_NC24ads_A100_v4",
   "adminUsername": "azureuser",
   "location": "westeurope"
 }
@@ -149,10 +149,6 @@ Skrypt automatycznie:
 
 | Rozmiar | vCPU | RAM | GPU | Zalecenia |
 |---------|------|-----|-----|-----------|
-| Standard_D4s_v3 | 4 | 16 GB | - | Minimum, wolniejsze |
-| Standard_D8s_v3 | 8 | 32 GB | - | **Zalecane** dla CPU |
-| Standard_NC6s_v3 | 6 | 112 GB | Tesla V100 | GPU starszej generacji |
-| Standard_NC4as_T4_v3 | 4 | 28 GB | Tesla T4 | GPU entry-level |
 | Standard_NC24ads_A100_v4 | 24 | 220 GB | **NVIDIA A100** | **Najlepsze** dla LLM |
 | Standard_NC48ads_A100_v4 | 48 | 440 GB | **NVIDIA A100** | Duże modele |
 | Standard_NC96ads_A100_v4 | 96 | 880 GB | **NVIDIA A100** | Enterprise |
@@ -163,7 +159,7 @@ Pełna lista w `bicep/main.bicep`:
 
 ```bicep
 param vmName string = 'bielik-vm'
-param vmSize string = 'Standard_D8s_v3'
+param vmSize string = 'Standard_NC24ads_A100_v4'
 param adminUsername string = 'azureuser'
 param authenticationType string = 'sshPublicKey'  // domyślnie SSH
 param location string = resourceGroup().location
@@ -209,7 +205,7 @@ $pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
 .\scripts\deploy.ps1 `
     -Environment prod `
     -ResourceGroupName bielik-prod-rg `
-    -VmSize Standard_NC6s_v3 `
+    -VmSize Standard_NC24ads_A100_v4 `
     -Location northeurope
 ```
 
@@ -234,6 +230,9 @@ az vm show -g bielik-rg -n bielik-vm --query "provisioningState"
 
 ```bash
 ssh azureuser@<PUBLIC_IP>
+
+Alternatywnie: użyj klucza SSH 
+ssh -i "ścieżka\do\klucza\prywatnego" azureuser@<PUBLIC_IP>
 ```
 
 ### 3. Sprawdź status Ollama
@@ -303,7 +302,7 @@ az network nsg rule list -g bielik-rg --nsg-name bielik-nsg --output table
 
 ### VM działa wolno
 
-- Rozważ większy VM size: Standard_D8s_v3 lub z GPU
+- Rozważ większy VM size
 - Sprawdź użycie zasobów: `htop`, `nvidia-smi` (dla GPU)
 
 ### Deployment się nie powiódł
@@ -393,7 +392,7 @@ Jeśli projekt Ci pomógł, zostaw ⭐ na GitHub!
 **Pamiętaj o kosztach Azure VM!**
 
 ```powershell
-# Wyłącz gdy nie używasz (oszczędzasz ~$280/m dla D8s_v3)
+# Wyłącz gdy nie używasz
 az vm deallocate -g bielik-rg -n bielik-vm
 
 # Włącz ponownie gdy potrzebujesz
