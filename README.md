@@ -52,10 +52,18 @@ Rozwiązanie automatycznie tworzy:
 ### Najszybsza metoda (A100 GPU w Polsce) 🚀
 
 ```powershell
-# 1. Ustaw hasło (będzie zapisane w zmiennej $pwd)
+# 1. Sklonuj repozytorium
+git clone https://github.com/AzureClub/BielikVMonAzure.git
+cd BielikVMonAzure
+
+# 2. Zaloguj się do Azure
+az login
+az account set --subscription "<your-subscription-id>"
+
+# 3. Ustaw hasło (będzie zapisane w zmiennej $pwd)
 $pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
 
-# 2. Uruchom deployment z A100 GPU
+# 4. Uruchom deployment z A100 GPU
 .\scripts\deploy.ps1 `
     -Environment prod `
     -ResourceGroupName bielik-rg `
@@ -72,7 +80,7 @@ $pwd = ConvertTo-SecureString "TwojeHaslo123!" -AsPlainText -Force
     -Location polandcentral `
     -EnablePublicOllamaAccess $true
 
-# 3. Po ~15-20 minutach testuj API (zastąp IP otrzymanym po deployment)
+# 5. Po ~15-20 minutach testuj API (zastąp IP otrzymanym po deployment)
 curl http://20.20.20.20:11434/api/chat -d '{
   "model": "SpeakLeash/bielik-11b-v2.6-instruct",
   "stream": false,
