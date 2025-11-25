@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "value": "bielik-staging-vm"
+    },
+    "vmSize": {
+      "value": "Standard_D8s_v3"
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "authenticationType": {
+      "value": "password"
+    },
+    "bielikModel": {
+      "value": "SpeakLeash/bielik-11b-v2.6-instruct"
+    },
+    "enablePublicOllamaAccess": {
+      "value": true
+    },
+    "resourcePrefix": {
+      "value": "bielik-staging"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "Bielik-Ollama",
+        "ManagedBy": "Bicep",
+        "CostCenter": "Testing"
+      }
+    }
+  }
+}

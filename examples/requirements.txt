@@ -1,0 +1,3 @@
+# Python requirements dla przykładów
+requests>=2.31.0
+httpx>=0.25.0
